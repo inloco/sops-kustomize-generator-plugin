@@ -5,63 +5,63 @@ import (
 	"log"
 	"os"
 
-	"go.mozilla.org/sops/decrypt"
-	"go.mozilla.org/sops/stores"
+	"go.mozilla.org/sops/aes"
+	sopsYAML "go.mozilla.org/sops/stores/yaml"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 )
 
-type document struct {
-	Data map[string]string `json:"data,omitempty"`
-	SOPS *stores.Metadata  `json:"sops,omitempty"`
-}
-
-type payload struct {
-	Type     coreV1.SecretType `json:"type,omitempty"`
-	Metadata metaV1.ObjectMeta `json:"metadata,omitempty"`
-	document `json:",inline"`
-}
-
 func main() {
 	filePath := os.Args[1]
 
-	input, err := ioutil.ReadFile(filePath)
+	encryptedData, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	var encryptedPayload payload
-	if err := yaml.Unmarshal(input, &encryptedPayload); err != nil {
-		log.Panic(err)
-	}
-
-	encryptedData, err := yaml.Marshal(encryptedPayload.document)
+	decryptedData, err := decrypt(encryptedData)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	decryptedData, err := decrypt.Data(encryptedData, "yaml")
+	secret := coreV1.Secret{}
+	if err := yaml.Unmarshal(decryptedData, &secret); err != nil {
+		log.Panic(err)
+	}
+	secret.TypeMeta = metaV1.TypeMeta{
+		APIVersion: "v1",
+		Kind:       "Secret",
+	}
+
+	output, err := yaml.Marshal(secret)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	decryptedPayload := coreV1.Secret{
-		TypeMeta: metaV1.TypeMeta{
-			APIVersion: "v1",
-			Kind:       "Secret",
-		},
-		Type:       encryptedPayload.Type,
-		ObjectMeta: encryptedPayload.Metadata,
-	}
-	if err := yaml.Unmarshal(decryptedData, &decryptedPayload); err != nil {
+	if _, err := os.Stdout.Write(output); err != nil {
 		log.Panic(err)
 	}
+}
 
-	output, err := yaml.Marshal(decryptedPayload)
+func decrypt(data []byte) ([]byte, error) {
+	// Initialize a Sops JSON store
+	store := &sopsYAML.Store{}
+
+	// Load SOPS file and access the data key
+	tree, err := store.LoadEncryptedFile(data)
 	if err != nil {
-		log.Panic(err)
+		return nil, err
+	}
+	key, err := tree.Metadata.GetDataKey()
+	if err != nil {
+		return nil, err
 	}
 
-	os.Stdout.Write(output)
+	// Decrypt the tree
+	if _, err := tree.Decrypt(key, aes.NewCipher()); err != nil {
+		return nil, err
+	}
+
+	return store.EmitPlainFile(tree.Branches)
 }
