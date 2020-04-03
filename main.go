@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"go.mozilla.org/sops/aes"
-	sopsYAML "go.mozilla.org/sops/stores/yaml"
+	"go.mozilla.org/sops/v3/aes"
+	sopsYAML "go.mozilla.org/sops/v3/stores/yaml"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
