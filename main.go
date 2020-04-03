@@ -17,17 +17,17 @@ func main() {
 
 	encryptedData, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Panic(err)
+		log.Panic(filePath, ": ", err)
 	}
 
 	decryptedData, err := decrypt(encryptedData)
 	if err != nil {
-		log.Panic(err)
+		log.Panic(filePath, ": ", err)
 	}
 
 	secret := coreV1.Secret{}
 	if err := yaml.Unmarshal(decryptedData, &secret); err != nil {
-		log.Panic(err)
+		log.Panic(filePath, ": ", err)
 	}
 	secret.TypeMeta = metaV1.TypeMeta{
 		APIVersion: "v1",
@@ -36,11 +36,11 @@ func main() {
 
 	output, err := yaml.Marshal(secret)
 	if err != nil {
-		log.Panic(err)
+		log.Panic(filePath, ": ", err)
 	}
 
 	if _, err := os.Stdout.Write(output); err != nil {
-		log.Panic(err)
+		log.Panic(filePath, ": ", err)
 	}
 }
 
