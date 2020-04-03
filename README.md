@@ -14,7 +14,7 @@ mkdir -p $PLACEMENT
 
 PLUGIN=$PLACEMENT/SOPS
 
-wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.0.0/plugin-linux-amd64
+wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.1.0/plugin-linux-amd64
 
 chmod +x $PLUGIN
 ```
@@ -27,7 +27,7 @@ mkdir -p $PLACEMENT
 
 PLUGIN=$PLACEMENT/SOPS
 
-wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.0.0/plugin-darwin-amd64
+wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.1.0/plugin-darwin-amd64
 
 chmod +x $PLUGIN
 ```
