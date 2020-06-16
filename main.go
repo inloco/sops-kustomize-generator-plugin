@@ -25,21 +25,12 @@ func main() {
 		log.Panic(filePath, ": ", err)
 	}
 
-	secret := coreV1.Secret{}
-	if err := yaml.Unmarshal(decryptedData, &secret); err != nil {
-		log.Panic(filePath, ": ", err)
-	}
-	secret.TypeMeta = metaV1.TypeMeta{
-		APIVersion: "v1",
-		Kind:       "Secret",
-	}
-
-	output, err := yaml.Marshal(secret)
+	secret, err := makeSecret(decryptedData)
 	if err != nil {
 		log.Panic(filePath, ": ", err)
 	}
 
-	if _, err := os.Stdout.Write(output); err != nil {
+	if _, err := os.Stdout.Write(secret); err != nil {
 		log.Panic(filePath, ": ", err)
 	}
 }
@@ -64,4 +55,17 @@ func decrypt(data []byte) ([]byte, error) {
 	}
 
 	return store.EmitPlainFile(tree.Branches)
+}
+
+func makeSecret(data []byte) ([]byte, error) {
+	secret := coreV1.Secret{}
+	if err := yaml.Unmarshal(data, &secret); err != nil {
+		return nil, err
+	}
+	secret.TypeMeta = metaV1.TypeMeta{
+		APIVersion: "v1",
+		Kind:       "Secret",
+	}
+	
+	return yaml.Marshal(secret)
 }
