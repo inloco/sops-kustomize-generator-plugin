@@ -97,3 +97,4 @@ generators:
 - You may need to use environment variables, such as `AWS_PROFILE`, to configure SOPS decryption when running Kustomize.
 - Integrity checks are disabled on SOPS decryption, this is done to prevent integrity failures due to Kustomize sortting the keys of original YAML file.
 - This documentation assumes that you are familiar with [Kustomize](https://github.com/kubernetes-sigs/kustomize) and [SOPS](https://github.com/mozilla/sops), read their documentation if necessary.
+- To make the generator behave like a patch, you might want to set `kustomize.config.k8s.io/behavior` annotation to `"merge"`. The other internal annotations described on [Kustomize Plugins Guide](https://kubernetes-sigs.github.io/kustomize/guides/plugins/#generator-options) are also supported.
