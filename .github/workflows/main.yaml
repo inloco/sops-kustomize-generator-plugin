@@ -73,7 +73,7 @@ jobs:
       - name: Check out code into directory
         uses: actions/checkout@v2.3.4
       - name: Update Git Tag
-        run: sed 's/v0.0.0/${{ github.ref }}/g' -i ./hack/install.sh
+        run: sed "s/v0.0.0/${GITHUB_REF##*/}/g" -i ./hack/install.sh
       - name: Upload script Release Asset
         uses: actions/upload-release-asset@v1.0.2
         env:
