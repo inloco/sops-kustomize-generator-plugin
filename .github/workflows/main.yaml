@@ -16,7 +16,7 @@ jobs:
           go-version: 1.14
         id: go
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2.1.0
+        uses: actions/checkout@v2.3.4
       - name: Make
         run: make continuous-integration
       - name: Upload artifact
@@ -29,38 +29,57 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v') && contains(github.ref, '.')
+    outputs:
+      upload-url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Create Release
-        uses: actions/create-release@v1.0.1
+        uses: actions/create-release@v1.1.4
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-      - name: Download macOS Artifact
+  publish-plugin:
+    name: Publish Plugin
+    needs: release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - name: macOS
+            kernel: darwin
+          - name: Linux
+            kernel: linux
+    steps:
+      - name: Download ${{ matrix.os.name }} Artifact
         uses: actions/download-artifact@v1.0.0
         with:
-          name: macOS
-      - name: Upload macOS Release Asset
+          name: ${{ matrix.os.name }}
+      - name: Upload ${{ matrix.os.name }} Release Asset
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./macOS/plugin
-          asset_name: plugin-darwin-amd64
+          upload_url: ${{ needs.release.outputs.upload-url }}
+          asset_path: ./${{ matrix.os.name }}/plugin
+          asset_name: plugin-${{ matrix.os.kernel }}-amd64
           asset_content_type: application/octet-stream
-      - name: Download Linux Artifact
-        uses: actions/download-artifact@v1.0.0
-        with:
-          name: Linux
-      - name: Upload Linux Release Asset
+  publish-script:
+    name: Publish Script
+    needs: publish-plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into directory
+        uses: actions/checkout@v2.3.4
+      - name: Update Git Tag
+        run: sed "s/v0.0.0/${GITHUB_REF##*/}/g" -i ./hack/install.sh
+      - name: Upload script Release Asset
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./Linux/plugin
-          asset_name: plugin-linux-amd64
-          asset_content_type: application/octet-stream
+          upload_url: ${{ needs.release.outputs.upload-url }}
+          asset_path: ./hack/install.sh
+          asset_name: install.sh
+          asset_content_type: text/x-shellscript

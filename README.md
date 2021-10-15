@@ -8,32 +8,11 @@ It is a plugin for [Kustomize](https://github.com/kubernetes-sigs/kustomize) tha
 
 To install this plugin on Kustomize, download the binary to Kustomize Plugin folder with `apiVersion: inloco.com.br/v1` and `kind: SOPS`. Then make it executable.
 
-#### Linux 64-bits
+#### Linux 64-bits and/or macOS 64-bits
 
 ```bash
-PLACEMENT=${XDG_CONFIG_HOME:-$HOME/.config}/kustomize/plugin/inloco.com.br/v1/sops
-
-mkdir -p $PLACEMENT
-
-PLUGIN=$PLACEMENT/SOPS
-
-wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.1.1/plugin-linux-amd64
-
-chmod +x $PLUGIN
-```
-
-#### macOS 64-bits
-
-```bash
-PLACEMENT=${XDG_CONFIG_HOME:-$HOME/.config}/kustomize/plugin/inloco.com.br/v1/sops
-
-mkdir -p $PLACEMENT
-
-PLUGIN=$PLACEMENT/SOPS
-
-wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.1.1/plugin-darwin-amd64
-
-chmod +x $PLUGIN
+VERSION=$(wget -qO- https://api.github.com/repos/inloco/sops-kustomize-generator-plugin/releases/latest | jq -r '.tag_name')
+wget -qO- https://github.com/inloco/sops-kustomize-generator-plugins/releases/download/${VERSION}/install.sh | sh
 ```
 
 #### Manual Build and Install for Other Systems and/or Architectures
