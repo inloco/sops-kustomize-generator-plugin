@@ -40,22 +40,6 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-  publish_install_sh:
-    name: Publish install.sh
-    needs: release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code into directory
-        uses: actions/checkout@v2.3.4
-      - name: Upload install.sh Release Asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload-url }}
-          asset_path: ./install.sh
-          asset_name: install.sh
-          asset_content_type: text/plain
   publish_plugin:
     name: Publish Plugin
     needs: release
@@ -81,3 +65,21 @@ jobs:
           asset_path: ./${{ matrix.os.name }}/plugin
           asset_name: plugin-${{ matrix.os.kernel }}-amd64
           asset_content_type: application/octet-stream
+  publish_script:
+    name: Publish Script
+    needs: publish_plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code into directory
+        uses: actions/checkout@v2.3.4
+      - name: Update Git Tag
+        run: sed 's/v0.0.0/${{ github.ref }}/g' -i ./hack/install.sh
+      - name: Upload script Release Asset
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload-url }}
+          asset_path: ./hack/install.sh
+          asset_name: install.sh
+          asset_content_type: text/plain

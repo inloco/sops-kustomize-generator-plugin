@@ -6,7 +6,7 @@ It is a plugin for [Kustomize](https://github.com/kubernetes-sigs/kustomize) tha
 
 To install this plugin on Kustomize, download the binary to Kustomize Plugin folder with `apiVersion: inloco.com.br/v1` and `kind: SOPS`. Then make it executable.
 
-### Linux 64-bits or macOS 64-bits
+### Linux 64-bits and/or macOS 64-bits
 
 ```bash
 wget -qO- https://github.com/inloco/sops-kustomize-generator-plugins/releases/download/v1.1.2/install.sh | sh
