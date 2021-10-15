@@ -67,7 +67,9 @@ jobs:
           asset_content_type: application/octet-stream
   publish-script:
     name: Publish Script
-    needs: publish-plugin
+    needs:
+      - release
+      - publish-plugin
     runs-on: ubuntu-latest
     steps:
       - name: Check out code into directory
