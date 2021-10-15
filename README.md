@@ -9,7 +9,8 @@ To install this plugin on Kustomize, download the binary to Kustomize Plugin fol
 ### Linux 64-bits and/or macOS 64-bits
 
 ```bash
-wget -qO- https://github.com/inloco/sops-kustomize-generator-plugins/releases/download/v1.1.2/install.sh | sh
+VERSION=$(wget -qO- https://api.github.com/repos/inloco/sops-kustomize-generator-plugin/releases/latest | jq -r '.tag_name')
+wget -qO- https://github.com/inloco/sops-kustomize-generator-plugins/releases/download/${VERSION}/install.sh | sh
 ```
 
 ### Manual Build and Install for Other Systems and/or Architectures
