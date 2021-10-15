@@ -2,41 +2,17 @@
 
 It is a plugin for [Kustomize](https://github.com/kubernetes-sigs/kustomize) that allows you to use Kubernetes Secrets encrypted with [SOPS](https://github.com/mozilla/sops) as a generator.
 
-## Getting Started
-
-### Install
+## Setup
 
 To install this plugin on Kustomize, download the binary to Kustomize Plugin folder with `apiVersion: inloco.com.br/v1` and `kind: SOPS`. Then make it executable.
 
-#### Linux 64-bits
+### Linux 64-bits or macOS 64-bits
 
 ```bash
-PLACEMENT=${XDG_CONFIG_HOME:-$HOME/.config}/kustomize/plugin/inloco.com.br/v1/sops
-
-mkdir -p $PLACEMENT
-
-PLUGIN=$PLACEMENT/SOPS
-
-wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.1.1/plugin-linux-amd64
-
-chmod +x $PLUGIN
+wget -qO- https://github.com/inloco/sops-kustomize-generator-plugins/releases/download/v1.1.2/install.sh | sh
 ```
 
-#### macOS 64-bits
-
-```bash
-PLACEMENT=${XDG_CONFIG_HOME:-$HOME/.config}/kustomize/plugin/inloco.com.br/v1/sops
-
-mkdir -p $PLACEMENT
-
-PLUGIN=$PLACEMENT/SOPS
-
-wget -O $PLUGIN https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/v1.1.1/plugin-darwin-amd64
-
-chmod +x $PLUGIN
-```
-
-#### Manual Build and Install for Other Systems and/or Architectures
+### Manual Build and Install for Other Systems and/or Architectures
 
 ```bash
 git clone https://github.com/inloco/sops-kustomize-generator-plugin
@@ -58,7 +34,7 @@ cd ..
 rm -fR sops-kustomize-generator-plugin
 ```
 
-### Using
+## Using
 
 We can start with a regular Kubernetes Secret in its YAML format.
 
