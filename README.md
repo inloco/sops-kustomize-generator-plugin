@@ -12,7 +12,7 @@ To install this plugin on Kustomize, download the binary to Kustomize Plugin fol
 
 ```bash
 VERSION=$(wget -qO- https://api.github.com/repos/inloco/sops-kustomize-generator-plugin/releases/latest | jq -r '.tag_name')
-wget -qO- https://github.com/inloco/sops-kustomize-generator-plugins/releases/download/${VERSION}/install.sh | sh
+wget -qO- https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/${VERSION}/install.sh | sh
 ```
 
 #### Manual Build and Install for Other Systems and/or Architectures
