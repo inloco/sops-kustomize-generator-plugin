@@ -11,14 +11,15 @@ To install this plugin on Kustomize, download the binary to Kustomize Plugin fol
 #### Linux 64-bits and/or macOS 64-bits
 
 ```bash
-VERSION=$(wget -qO- https://api.github.com/repos/inloco/sops-kustomize-generator-plugin/releases/latest | jq -r '.tag_name')
-wget -qO- https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/${VERSION}/install.sh | sh
+VERSION="$(wget -qO- 'https://api.github.com/repos/inloco/sops-kustomize-generator-plugin/releases/latest' | jq -r '.tag_name')"
+
+wget -qO- "https://github.com/inloco/sops-kustomize-generator-plugin/releases/download/${VERSION}/install.sh" | sh
 ```
 
 #### Manual Build and Install for Other Systems and/or Architectures
 
 ```bash
-git clone https://github.com/inloco/sops-kustomize-generator-plugin
+git clone 'https://github.com/inloco/sops-kustomize-generator-plugin'
 
 cd sops-kustomize-generator-plugin
 
@@ -26,11 +27,11 @@ go get -d -v ./...
 
 go build -a -installsuffix cgo -ldflags '-extldflags "-static" -s -w' -tags netgo -v ./...
 
-PLACEMENT=${XDG_CONFIG_HOME:-$HOME/.config}/kustomize/plugin/inloco.com.br/v1/sops
+PLACEMENT="${XDG_CONFIG_HOME:-${HOME}/.config}/kustomize/plugin/inloco.com.br/v1/sops"
 
-mkdir -p $PLACEMENT
+mkdir -p "${PLACEMENT}"
 
-mv ./sops-kustomize-generator-plugin $PLACEMENT/SOPS
+mv ./sops-kustomize-generator-plugin "${PLACEMENT}/SOPS"
 
 cd ..
 
