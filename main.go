@@ -1,12 +1,11 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 
-	"go.mozilla.org/sops/v3/aes"
-	sopsYAML "go.mozilla.org/sops/v3/stores/yaml"
+	"github.com/getsops/sops/v3/aes"
+	sopsYAML "github.com/getsops/sops/v3/stores/yaml"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
@@ -15,7 +14,7 @@ import (
 func main() {
 	filePath := os.Args[1]
 
-	encryptedData, err := ioutil.ReadFile(filePath)
+	encryptedData, err := os.ReadFile(filePath)
 	if err != nil {
 		log.Panic(filePath, ": ", err)
 	}
