@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine
+FROM golang:1.22-alpine
 WORKDIR /go/src/github.com/inloco/sops-kustomize-generator-plugin
 COPY . .
 ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on
