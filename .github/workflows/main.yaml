@@ -57,7 +57,7 @@ jobs:
             kernel: linux
     steps:
       - name: Download ${{ matrix.os.name }} Artifact
-        uses: actions/download-artifact@v1.0.0
+        uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ matrix.os.name }}
       - name: Upload ${{ matrix.os.name }} Release Asset
