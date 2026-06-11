@@ -10,6 +10,7 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
+	"strconv"
 )
 
 func main() {
@@ -22,9 +23,16 @@ func main() {
 
 	noDecryptEnv := os.Getenv("SOPS_NO_DECRYPT")
 
-	shouldDecrypt := noDecryptEnv != "1" && noDecryptEnv != "true"
+	noDecrypt := false
+	if noDecryptEnv != "" {
+		v, err := strconv.ParseBool(noDecryptEnv)
+		if err != nil {
+			log.Panicf("invalid SOPS_NO_DECRYPT value %q: %v", noDecryptEnv, err)
+		}
+		noDecrypt = v
+	}
 
-	if shouldDecrypt {
+	if !noDecrypt {
 		runDecrypt(filePath, encryptedData)
 	} else {
 		runNoDecrypt(filePath, encryptedData)
