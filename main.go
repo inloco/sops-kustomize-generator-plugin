@@ -25,8 +25,10 @@ func main() {
 
 	var secret []byte
 	if shouldDecrypt {
+		log.Println("Running with decryption")
 		secret, err = runDecrypt(encryptedData)
 	} else {
+		log.Println("Running with NO decryption")
 		secret, err = runNoDecrypt(encryptedData)
 	}
 	if err != nil {
