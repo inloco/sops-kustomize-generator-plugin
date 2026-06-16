@@ -29,6 +29,9 @@ func main() {
 	} else {
 		secret, err = runNoDecrypt(encryptedData)
 	}
+	if err != nil {
+		log.Panic(filePath, ": ", err)
+	}
 	if _, err := os.Stdout.Write(secret); err != nil {
 		log.Panic(filePath, ": ", err)
 	}
