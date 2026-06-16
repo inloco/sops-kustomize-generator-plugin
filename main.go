@@ -25,7 +25,6 @@ func main() {
 
 	var secret []byte
 	if shouldDecrypt {
-		log.Println("Running with decryption")
 		secret, err = runDecrypt(encryptedData)
 	} else {
 		log.Println("[SOPS] Running in no-decrypt mode")
