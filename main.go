@@ -10,7 +10,6 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
-	"strconv"
 )
 
 func main() {
@@ -21,49 +20,31 @@ func main() {
 		log.Panic(filePath, ": ", err)
 	}
 
-	noDecryptEnv := os.Getenv("SOPS_NO_DECRYPT")
+	_, noDecryptEnv := os.LookupEnv("SOPS_NO_DECRYPT")
+	shouldDecrypt := !noDecryptEnv
 
-	noDecrypt := false
-	if noDecryptEnv != "" {
-		v, err := strconv.ParseBool(noDecryptEnv)
-		if err != nil {
-			log.Panicf("invalid SOPS_NO_DECRYPT value %q: %v", noDecryptEnv, err)
-		}
-		noDecrypt = v
-	}
-
-	if !noDecrypt {
-		runDecrypt(filePath, encryptedData)
+	var secret []byte
+	if shouldDecrypt {
+		secret, err = runDecrypt(encryptedData)
 	} else {
-		runNoDecrypt(filePath, encryptedData)
+		secret, err = runNoDecrypt(encryptedData)
+	}
+	if _, err := os.Stdout.Write(secret); err != nil {
+		log.Panic(filePath, ": ", err)
 	}
 }
 
-func runDecrypt(filePath string, encryptedData []byte) {
+func runDecrypt(encryptedData []byte) ([]byte, error) {
 	decryptedData, err := decrypt(encryptedData)
 	if err != nil {
-		log.Panic(filePath, ": ", err)
+		return nil, err
 	}
 
-	secret, err := makeSecret(decryptedData)
-	if err != nil {
-		log.Panic(filePath, ": ", err)
-	}
-
-	if _, err := os.Stdout.Write(secret); err != nil {
-		log.Panic(filePath, ": ", err)
-	}
+	return makeSecret(decryptedData)
 }
 
-func runNoDecrypt(filePath string, encryptedData []byte) {
-	secret, err := makeEncryptedSecret(encryptedData)
-	if err != nil {
-		log.Panic(filePath, ": ", err)
-	}
-
-	if _, err := os.Stdout.Write(secret); err != nil {
-		log.Panic(filePath, ": ", err)
-	}
+func runNoDecrypt(encryptedData []byte) ([]byte, error) {
+	return makeSecretNoDecrypt(encryptedData)
 }
 
 func decrypt(data []byte) ([]byte, error) {
@@ -101,7 +82,7 @@ func makeSecret(data []byte) ([]byte, error) {
 	return yaml.Marshal(secret)
 }
 
-func makeEncryptedSecret(data []byte) ([]byte, error) {
+func makeSecretNoDecrypt(data []byte) ([]byte, error) {
 	store := &sopsYAML.Store{}
 	tree, err := store.LoadEncryptedFile(data)
 	if err != nil {
