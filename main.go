@@ -28,7 +28,7 @@ func main() {
 		log.Println("Running with decryption")
 		secret, err = runDecrypt(encryptedData)
 	} else {
-		log.Println("Running with NO decryption")
+		log.Println("[SOPS] Running in no-decrypt mode")
 		secret, err = runNoDecrypt(encryptedData)
 	}
 	if err != nil {
