@@ -102,9 +102,14 @@ func makeSecretNoDecrypt(data []byte) ([]byte, error) {
 	secret.Data = getDataNoDecrypt(tree.Branches)
 	secret.StringData = getStringDataNoDecrypt(tree.Branches)
 
-	metadata := getMetadataNoDecrypt(tree.Branches)
-	secret.ObjectMeta.Name = metadata["name"]
-	secret.ObjectMeta.Namespace = metadata["namespace"]
+	metadata, err := getMetadataNoDecrypt(tree.Branches)
+	if err != nil {
+		return nil, err
+	}
+
+	if metadata != nil {
+		secret.ObjectMeta = *metadata
+	}
 
 	return yaml.Marshal(secret)
 }
@@ -137,21 +142,27 @@ func getStringDataNoDecrypt(branches sops.TreeBranches) map[string]string {
 	return nil
 }
 
-func getMetadataNoDecrypt(branches sops.TreeBranches) map[string]string {
-	for _, item := range branches[0] {
-		if item.Key == "metadata" {
-			var result = make(map[string]string)
-
-			metadata := item.Value.(sops.TreeBranch)
-			for _, mdta := range metadata {
-				if mdta.Key.(string) == "name" {
-					result["name"] = mdta.Value.(string)
-				} else if mdta.Key.(string) == "namespace" {
-					result["namespace"] = mdta.Value.(string)
-				}
-			}
-			return result
-		}
+func getMetadataNoDecrypt(branches sops.TreeBranches) (*metaV1.ObjectMeta, error) {
+	obj, err := sops.EmitAsMap(branches)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+
+	rawMeta, ok := obj["metadata"]
+
+	if !ok {
+		return nil, nil
+	}
+
+	metaYaml, err := yaml.Marshal(rawMeta)
+	if err != nil {
+		return nil, err
+	}
+
+	var meta metaV1.ObjectMeta
+	if err := yaml.Unmarshal(metaYaml, &meta); err != nil {
+		return nil, err
+	}
+
+	return &meta, nil
 }
