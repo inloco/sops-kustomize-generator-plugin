@@ -109,6 +109,13 @@ func makeSecretNoDecrypt(data []byte) ([]byte, error) {
 
 	if metadata != nil {
 		secret.ObjectMeta = *metadata
+		// Clear server-assigned/read-only fields to keep generated manifests applyable.
+		secret.ObjectMeta.ResourceVersion = ""
+		secret.ObjectMeta.UID = ""
+		secret.ObjectMeta.SelfLink = ""
+		secret.ObjectMeta.Generation = 0
+		secret.ObjectMeta.CreationTimestamp = metaV1.Time{}
+		secret.ObjectMeta.ManagedFields = nil
 	}
 
 	return yaml.Marshal(secret)
